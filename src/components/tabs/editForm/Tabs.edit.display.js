@@ -1,4 +1,5 @@
 import ComponentEditConditional from '../../_classes/component/editForm/Component.edit.conditional';
+import ComponentEditLogic from '../../_classes/component/editForm/Component.edit.logic';
 
 export default [
   {
@@ -65,6 +66,17 @@ export default [
         'input': false,
         'tableView': false,
         'components': ComponentEditConditional
+      },
+      {
+        'collapsible': false,
+        'dataGridLabel': true,
+        'modalEdit': true,
+        'key': 'tab-field-logic',
+        'type': 'panel',
+        'label': 'Logic',
+        'input': false,
+        'tableView': false,
+        'components': ComponentEditLogic
       }
     ]
   },

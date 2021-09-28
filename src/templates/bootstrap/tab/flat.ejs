@@ -1,5 +1,5 @@
 {% ctx.tabItemComponents.forEach(function(tab, index) { %}
-  <div class="mb-2 card border">
+  <div class="mb-2 card border{{ tab.disabled ? ' disabled' : ''}}">
     <div class="card-header bg-default">
       <h4 class="mb-0 card-title">{{ ctx.t(tab.label, { _userInput: true }) }}</h4>
     </div>

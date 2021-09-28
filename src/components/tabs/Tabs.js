@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import NestedComponent from '../_classes/nested/NestedComponent';
 import * as FormioUtils from '../../utils/utils';
+import { fastCloneDeep } from '../../utils/utils';
 
 export default class TabsComponent extends NestedComponent {
   static schema(...extend) {
@@ -90,13 +91,14 @@ export default class TabsComponent extends NestedComponent {
     const currentTabItemComponent = this.tabItemComponents[this.currentTab];
     let index = 0;
     for (const tabItemComponent of this.component.components) {
-      if (this.builderMode || this.previewMode || FormioUtils.checkCondition(
+      const hasCondition = FormioUtils.hasCondition(tabItemComponent);
+      if (this.builderMode || this.previewMode || hasCondition && FormioUtils.checkCondition(
         tabItemComponent,
         this.data,
         this.rootValue,
         this.root ? this.root._form : {},
         this
-      )) {
+      ) || !hasCondition && !tabItemComponent.hidden) {
         if (init || this.tabItemComponents[index] !== tabItemComponent) {
           this.tabItemComponents[index] = tabItemComponent;
           if (!tabItemComponent.components) {
@@ -150,6 +152,108 @@ export default class TabsComponent extends NestedComponent {
     return superAttach;
   }
 
+  detachLogic() {
+    super.detachLogic();
+    for (const tabItemComponent of this.component.components) {
+      if (!tabItemComponent.logic) {
+        continue;
+      }
+      for (const logic of tabItemComponent.logic) {
+        if (logic.trigger.type !== 'event') {
+          continue;
+        }
+        const event = this.interpolate(logic.trigger.event);
+        this.off(event);
+      }
+    }
+  }
+
+  fieldLogic(data, row) {
+    data = data || this.rootValue;
+    row = row || this.data;
+    const logics = this.logic;
+
+    // If there aren't logic, don't go further.
+    if (logics.length === 0) {
+      return;
+    }
+
+    const newComponent = fastCloneDeep(this.originalComponent);
+
+    let changed = logics.reduce((changed, logic) => {
+      const result = FormioUtils.checkTrigger(
+        newComponent,
+        logic.trigger,
+        row,
+        data,
+        this.root ? this.root._form : {},
+        this,
+      );
+
+      return (result ? this.applyActions(newComponent, logic.actions, result, row, data) : false) || changed;
+    }, false);
+
+    for (const tabItemComponent of newComponent.components) {
+      if (!tabItemComponent.logic) {
+        continue;
+      }
+      tabItemComponent.logic.forEach((logic) => {
+        const result = FormioUtils.checkTrigger(
+          tabItemComponent,
+          logic.trigger,
+          row,
+          data,
+          this.root ? this.root._form : {},
+          this,
+        );
+        changed = (result ? this.applyActions(tabItemComponent, logic.actions, result, row, data) : false) || changed;
+      });
+    }
+
+    // If component definition changed, replace and mark as changed.
+    if (!_.isEqual(this.component, newComponent)) {
+      this.component = newComponent;
+      changed = true;
+      const disabled = this.shouldDisabled;
+      // Change disabled state if it has changed
+      if (this.disabled !== disabled) {
+        this.disabled = disabled;
+      }
+    }
+
+    return changed;
+  }
+
+  attachLogic() {
+    // Do not attach logic during builder mode.
+    if (this.builderMode) {
+      return;
+    }
+    super.attachLogic();
+    for (let i = 0; i < this.component.components.length; i++) {
+      let tabItemComponent = this.component.components[i];
+      if (!tabItemComponent.logic) {
+        continue;
+      }
+      for (const logic of tabItemComponent.logic) {
+        if (logic.trigger.type !== 'event') {
+          continue;
+        }
+        this.on(event, (...args) => {
+          const newTabItemComponent = fastCloneDeep(tabItemComponent);
+          if (this.applyActions(newTabItemComponent, logic.actions, args)) {
+            // If component definition changed, replace it.
+            tabItemComponent = this.component.components[i];
+            if (!_.isEqual(tabItemComponent, newTabItemComponent)) {
+              this.component.components[this.component.components.indexOf(tabItemComponent)] = newTabItemComponent;
+              this.redraw();
+            }
+          }
+        }, true);
+      }
+    }
+  }
+
   detach(all) {
     super.detach(all);
   }
@@ -164,11 +268,11 @@ export default class TabsComponent extends NestedComponent {
       !this.tabs ||
       !this.tabs[index] ||
       !this.refs[this.tabKey] ||
-      !this.refs[this.tabKey][index]
+      !this.refs[this.tabKey][index] ||
+      this.tabItemComponents[index].disabled
     ) {
       return;
     }
-
     this.currentTab = index;
 
     _.each(this.refs[this.tabKey], (tab) => {
