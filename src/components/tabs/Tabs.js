@@ -172,9 +172,8 @@ export default class TabsComponent extends NestedComponent {
     data = data || this.rootValue;
     row = row || this.data;
     const logics = this.logic;
-
     // If there aren't logic, don't go further.
-    if (logics.length === 0) {
+    if (logics.length === 0 && (!this.originalComponent.components || !this.originalComponent.components.some(c => c.logic && c.logic.length > 0))) {
       return;
     }
 
