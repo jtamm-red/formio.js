@@ -157,6 +157,13 @@ export default class Webform extends NestedDataComponent {
     this.submitted = false;
 
     /**
+     * Determines if the form has tried to be submitted, error or not.
+     *
+     * @type {boolean}
+     */
+    this.alertClosed = false;
+
+    /**
      * Determines if the form is being submitted at the moment.
      *
      * @type {boolean}
@@ -1104,13 +1111,14 @@ export default class Webform extends NestedDataComponent {
     if (message) {
       const attrs = {
         class: (options && options.classes) || `alert alert-${type}`,
-        id: `error-list-${this.id}`,
+        id: `error-list-${this.id}`
       };
 
       const templateOptions = {
         message: message instanceof HTMLElement ? message.outerHTML : message,
         attrs: attrs,
-        type
+        type,
+        closeButton: true
       };
 
       this.alert = convertStringToHTMLElement(this.renderTemplate('alert', templateOptions),`#${attrs.id}`);
@@ -1118,9 +1126,15 @@ export default class Webform extends NestedDataComponent {
     if (!this.alert) {
       return;
     }
+    this.alertClosed = false;
 
-    this.loadRefs(this.alert, { errorRef: 'multiple' });
-
+    this.loadRefs(this.alert, { errorRef: 'multiple', closeButton: 'single' });
+    if (this.refs.closeButton) {
+      this.refs.closeButton.addEventListener('click', () => {
+        this.alert.remove();
+        this.alertClosed = true;
+      });
+    }
     if (this.refs.errorRef && this.refs.errorRef.length) {
       this.refs.errorRef.forEach(el => {
         this.addEventListener(el, 'click', (e) => {
@@ -1353,7 +1367,7 @@ export default class Webform extends NestedDataComponent {
 
     value.isValid = this.checkData(value.data, flags);
     this.loading = false;
-    if (this.submitted) {
+    if (this.submitted && !this.alertClosed) {
       this.showErrors();
     }
 

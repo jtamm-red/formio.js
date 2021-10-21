@@ -1651,3 +1651,9 @@ span[role="link"] {
   text-decoration: underline;
   cursor: pointer;
 }
+
+.alert {
+  > button.close-button {
+    float: right;
+  }
+}

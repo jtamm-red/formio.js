@@ -3,6 +3,7 @@
     {{attr}}="{{ctx.attrs[attr]}}"
   {% } %}
 >
+    {% if (ctx.closeButton) { %} <button class="btn btn-link close-button" type="button" ref="closeButton">X</button> {% } %}
   {{ctx.message}}
   {% if (ctx.options.vpat) { %}
     <span class="sr-only" id="hotkey-i-{{ctx.form._id}}">{{ctx.t('errorListHotkey')}}</span>
