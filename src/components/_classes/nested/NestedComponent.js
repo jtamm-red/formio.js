@@ -421,7 +421,7 @@ export default class NestedComponent extends Field {
   render(children) {
     // If already rendering, don't re-render.
     return super.render(children || this.renderTemplate(this.templateName, {
-      children: this.renderComponents(),
+      children: !this.visible ? '' : this.renderComponents(),
       nestedKey: this.nestedKey,
       collapsed: this.options.pdf ? false : this.collapsed,
     }));
@@ -575,24 +575,6 @@ export default class NestedComponent extends Field {
 
     this.checkModal(isValid, this.isDirty);
     return isValid;
-  }
-
-  checkModal(isValid, dirty) {
-    if (!this.component.modalEdit || !this.componentModal) {
-      return;
-    }
-    const messages = this.errors;
-    this.clearErrorClasses(this.refs.openModalWrapper);
-    this.error = '';
-    if (!isValid && (dirty || !this.isPristine && !!messages.length)) {
-      this.error = {
-        component: this.component,
-        level: 'hidden',
-        message: this.t('Fix the errors'),
-        messages,
-      };
-      this.setErrorClasses([this.refs.openModal], dirty, !isValid, !!messages.length, this.refs.openModalWrapper);
-    }
   }
 
   checkConditions(data, flags, row) {

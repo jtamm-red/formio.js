@@ -5,6 +5,7 @@ import { fastCloneDeep, eachComponent } from './utils/utils';
 
 export default class PDF extends Webform {
   constructor(element, options) {
+    options.display = 'pdf';
     super(element, options);
     this.components = [];
   }
@@ -182,6 +183,10 @@ export default class PDF extends Webform {
     let iframeSrc = `${this._form.settings.pdf.src}.html`;
     const params = [`id=${this.id}`];
 
+    if (this.options.showCheckboxBackground || this._form.settings.showCheckboxBackground) {
+      params.push('checkboxbackground=1');
+    }
+
     if (this.options.readOnly) {
       params.push('readonly=1');
     }
@@ -201,8 +206,8 @@ export default class PDF extends Webform {
     return iframeSrc;
   }
 
-  setForm(form) {
-    return super.setForm(form).then(() => {
+  setForm(form, flags = {}) {
+    return super.setForm(form, flags).then(() => {
       if (this.formio) {
         form.projectUrl = this.formio.projectUrl;
         form.url = this.formio.formUrl;

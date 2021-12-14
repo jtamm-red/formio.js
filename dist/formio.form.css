@@ -94,6 +94,12 @@ dialog.fixed {
   background-color: #f8d7da;
   border-color: #f5c6cb;
 }
+.formio-error-wrapper .formio-errors .error {
+  color: #C20000;
+}
+.formio-error-wrapper .field-required:after {
+  color: #C20000;
+}
 
 .formio-warning-wrapper {
   color: #856404;
@@ -115,7 +121,7 @@ dialog.fixed {
 }
 
 .formio-errors .error {
-  color: #BF2231;
+  color: #dc3545;
 }
 .formio-errors .warning {
   color: #856404;
@@ -166,10 +172,6 @@ dialog.fixed {
 
 .formio-component-tags tags {
   background-color: #fff;
-}
-
-.formio-error-wrapper .field-required:after {
-  color: #C20000;
 }
 
 .field-required:after, .tab-error::after {
@@ -239,6 +241,12 @@ dialog.fixed {
   margin-top: 5px;
 }
 
+.card-vertical .card-body,
+.tab-content,
+.tab {
+  flex-grow: 2;
+}
+
 .nav-tabs-vertical {
   display: flex;
   flex-direction: column;
@@ -246,6 +254,12 @@ dialog.fixed {
   padding-left: 5px;
   margin-right: 10px;
   border-bottom: 0;
+}
+
+.card-vertical > .card-body,
+.card-vertical > .tab-content,
+.card-vertical > .tab {
+  flex-basis: 85%;
 }
 
 .card-vertical ul > li > .nav-link-vertical {
@@ -314,6 +328,14 @@ td > .form-group {
 
 .formio-component-multiple .choices__input {
   width: 100%;
+}
+
+.formio-component-multiple .is-invalid {
+  border-color: #F04124;
+}
+
+.formio-component-multiple :not(.is-invalid) {
+  border-color: #ccc;
 }
 
 .choices__list--dropdown .choices__item--selectable {
@@ -803,11 +825,14 @@ body.formio-dialog-open {
   margin: 0;
 }
 
+.formio-removed {
+  display: none;
+}
+
 .control-label--hidden {
   position: absolute;
   top: 6px;
   right: 5px;
-  font-size: 1.5em;
 }
 
 .formio-component-datetime .control-label--hidden.field-required {
@@ -824,6 +849,23 @@ body.formio-dialog-open {
 .formio-component-select .control-label--hidden.field-required {
   right: 40px;
   z-index: 2;
+}
+
+.formio-component-radio .control-label--hidden.field-required:after,
+.formio-component-selectboxes .control-label--hidden.field-required:after {
+  display: none;
+}
+
+.formio-component-radio.formio-component-label-hidden.required .form-check-label:before,
+.formio-component-selectboxes.formio-component-label-hidden.required .form-check-label:before {
+  position: relative;
+  content: "* ";
+  color: #EB0000;
+}
+
+.formio-component-radio.formio-component-label-hidden.required .label-position-right.form-check-label:before,
+.formio-component-selectboxes.formio-component-label-hidden.required .label-position-right.form-check-label:before {
+  right: 20px;
 }
 
 /* Fix for Hidden checkbox in component editform. */
@@ -1046,6 +1088,9 @@ td .formio-component-modaledit .formio-modaledit-view-container {
   opacity: 0;
   position: relative;
   z-index: -1;
+  display: block;
+  height: 0;
+  border: none;
 }
 
 .has-error > .help-block {
@@ -1514,7 +1559,7 @@ div[data-oembed-url] {
   display: flex;
 }
 .formio-wizard-nav-container li {
-  margin-right: 0.25rem;
+  margin-right: 0.5rem;
 }
 @media not all and (min-width: 30em) {
   .formio-wizard-nav-container {

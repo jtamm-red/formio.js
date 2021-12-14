@@ -3,7 +3,7 @@
 {% } %}
 {% if (!ctx.self.imageUpload) { %}
   {% if (ctx.options.vpat) { %}
-    <div>{{(!ctx.component.filePattern || ctx.component.filePattern === '*') ? 'Any file types are allowed' : ctx.t('Allowed file types: ') + ctx.allowedFileTypes}}</div>
+    <div>{{(!ctx.component.filePattern || ctx.component.filePattern === '*') ? 'Any file types are allowed' : ctx.t('Allowed file types: ') + ctx.component.filePattern}}</div>
   {% } %}
   <ul class="list-group list-group-striped">
     <li class="list-group-item list-group-header hidden-xs hidden-sm">
@@ -38,7 +38,7 @@
             <div class="col-md-2">
               <select class="file-type" ref="fileType">
                 {% ctx.component.fileTypes.map(function(type) { %}
-                  <option class="test" value="{{ type.value }}" {% if (type.label === file.fileType) { %}selected="selected"{% } %}>{{ type.label }}</option>
+                  <option class="test" value="{{ type.value }}" {% if (type.label === file.fileType) { %}selected="selected"{% } %}>{{ctx.t(type.label)}}</option>
                 {% }); %}
               </select>
             </div>
@@ -82,7 +82,7 @@
           <span class="sr-only">
             {{ctx.t('Browse to attach file for ' + ctx.component.label + '. ' + 
             (ctx.component.description ? ctx.component.description + '. ' : '') + 
-            ((!ctx.component.filePattern || ctx.component.filePattern === '*') ? 'Any file types are allowed' : ctx.t('Allowed file types: ') + ctx.allowedFileTypes))}}
+            ((!ctx.component.filePattern || ctx.component.filePattern === '*') ? 'Any file types are allowed' : ctx.t('Allowed file types: ') + ctx.component.filePattern))}}
           </span>
         </a>
       <div ref="fileProcessingLoader" class="loader-wrapper">
